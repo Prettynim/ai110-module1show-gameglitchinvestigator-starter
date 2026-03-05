@@ -125,6 +125,72 @@ The critical test `test_lexicographic_bug_prevented()` verifies that the guess "
 - Targeted tests are better than generic happy-path tests for proving bugs are fixed
 - Using tools like pytest and git commits together creates a clear audit trail of debugging work
 
+## 🚀 Optional Extensions
 
+### ✅ Challenge 1: Advanced Edge-Case Testing (COMPLETED)
 
-- [ ] [If you choose to complete Challenge 4, insert a screenshot of your Enhanced Game UI here]
+Implemented comprehensive edge-case testing to verify robustness of game logic functions. Created 17 additional pytest test cases targeting potential failure points:
+
+**parse_guess() Edge Cases Tested:**
+- Decimal inputs (e.g., "3.7" → 3)
+- Large decimals with many places (99.99999)
+- Negative numbers (-5)
+- Very large numbers beyond game range (999999)
+- Zero and boundary values
+- Leading zeros ("007" → 7)
+- Whitespace handling ("  50  ")
+- Non-numeric inputs ("abc")
+- Special characters ("$50")
+
+**check_guess() Edge Cases Tested:**
+- Boundary comparisons (0, 1, 100)
+- Off-by-one scenarios (49 vs 50, 51 vs 50)
+- Negative numbers (-10 vs -5)
+- Mixed negative/positive (-5 vs 50)
+- Very large numbers (1000000 vs 999999)
+- String inputs with leading zeros ("007" vs "50")
+
+**Test Results: 24/24 Passing ✅**
+
+```
+============================= test session starts =============================
+platform win32 -- Python 3.14.3, pytest-9.0.2
+
+collected 24 items
+
+tests/test_game_logic.py::test_winning_guess PASSED                      [  4%]
+tests/test_game_logic.py::test_guess_too_high PASSED                     [  8%]
+tests/test_game_logic.py::test_guess_too_low PASSED                      [ 12%]
+tests/test_game_logic.py::test_secret_as_string PASSED                   [ 16%]
+tests/test_game_logic.py::test_secret_and_guess_both_strings PASSED      [ 20%]
+tests/test_game_logic.py::test_lexicographic_bug_prevented PASSED        [ 25%]
+tests/test_game_logic.py::test_win_with_string_secret PASSED             [ 29%]
+tests/test_game_logic.py::test_parse_guess_with_decimal PASSED           [ 33%]
+tests/test_game_logic.py::test_parse_guess_with_large_decimal PASSED     [ 37%]
+tests/test_game_logic.py::test_parse_guess_with_negative_number PASSED   [ 41%]
+tests/test_game_logic.py::test_parse_guess_with_large_number PASSED      [ 45%]
+tests/test_game_logic.py::test_parse_guess_with_zero PASSED              [ 50%]
+tests/test_game_logic.py::test_parse_guess_with_leading_zeros PASSED     [ 54%]
+tests/test_game_logic.py::test_parse_guess_with_whitespace_string PASSED [ 58%]
+tests/test_game_logic.py::test_parse_guess_with_non_numeric PASSED       [ 62%]
+tests/test_game_logic.py::test_parse_guess_with_special_characters PASSED [ 66%]
+tests/test_game_logic.py::test_check_guess_boundary_zero PASSED          [ 70%]
+tests/test_game_logic.py::test_check_guess_boundary_same PASSED          [ 75%]
+tests/test_game_logic.py::test_check_guess_off_by_one_low PASSED         [ 79%]
+tests/test_game_logic.py::test_check_guess_off_by_one_high PASSED        [ 83%]
+tests/test_game_logic.py::test_check_guess_with_negative_numbers PASSED  [ 87%]
+tests/test_game_logic.py::test_check_guess_negative_vs_positive PASSED   [ 91%]
+tests/test_game_logic.py::test_check_guess_with_very_large_numbers PASSED [ 95%]
+tests/test_game_logic.py::test_check_guess_string_with_leading_zeros PASSED [100%]
+
+============================== 24 passed in 0.06s ==============================
+```
+
+**Why This Matters:**
+These 17 edge-case tests verify that:
+- Input parsing handles user typos and unusual formats gracefully
+- Numeric comparison works correctly even with negative numbers, very large values, and boundary cases
+- The game logic doesn't break under unexpected but valid inputs
+- The core bug fix (numeric vs string comparison) holds up across diverse scenarios
+
+These tests catch issues that users might encounter in the wild, ensuring robust game logic and player experience.

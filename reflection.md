@@ -83,3 +83,34 @@ Instead of accepting AI suggestions at face value, I'll ask the AI to trace thro
 
 **How This Changed My Thinking About AI Code:**
 AI-generated code can look plausible and well-structured, but it can still have subtle logic bugs baked in—sometimes intentionally as "glitches" for educational purposes. I now understand that I need to read AI code more defensively, looking for conditional logic that changes behavior based on input state (like the `if attempt % 2 == 0` conversion), and I'll use tests to verify assumptions rather than trusting the code structure alone.
+
+---
+
+## 6. Optional Extension: Challenge 1 - Advanced Edge-Case Testing
+
+**Challenge Completed:** Implemented 17 comprehensive edge-case tests to verify robustness of game logic.
+
+**Edge Cases Added:**
+
+*parse_guess() Testing:*
+- Decimal inputs ("3.7" → 3, "99.99999" → 99)
+- Negative numbers ("-5")
+- Very large numbers ("999999")
+- Boundary values ("0")
+- Leading zeros ("007" → 7)
+- Whitespace (" 50 ")
+- Non-numeric ("abc")
+- Special characters ("$50")
+
+*check_guess() Testing:*
+- Boundary comparisons (0, 1, 100)
+- Off-by-one scenarios (49 vs 50, 51 vs 50)
+- Negative numbers (-10 vs -5, -5 vs 50)
+- Very large numbers (1000000 vs 999999)
+- String inputs with leading zeros ("007" vs "50")
+
+**Results:** All 24 tests pass (7 core + 17 edge-case tests). This demonstrates that the fixed numeric comparison logic is robust across diverse inputs, including edge cases that users might encounter in the wild.
+
+**Why This Matters:** Edge-case testing goes beyond happy-path testing. It catches the "weird" inputs that real users accidentally (or intentionally) provide. By systematically testing decimals, negatives, very large numbers, and string variations, I've verified that the core bug fix (always use numeric comparison) doesn't break under unusual but valid inputs.
+
+**Key Insight:** The parse_guess function gracefully converts many input formats (decimals, leading zeros, whitespace) into valid integers. The check_guess function now reliably handles these converted values with numeric comparison. Together, they create a robust input-processing pipeline that won't crash on edge cases.
