@@ -32,7 +32,7 @@ This is an AI-generated guessing game built with Streamlit where players have li
 
 **Bug 1: Hard Difficulty Easier Than Normal**
 - **Issue:** Hard mode had range 1-50 while Normal was 1-100, making Hard actually easier
-- **Fix:** Identified the range mismatch in `get_range_for_difficulty()` (marked as FIXME but left unfixed as it was a stretch goal)
+- **Fix:** Updated `get_range_for_difficulty()` in `logic_utils.py` to use range 1-200 for Hard mode.
 
 **Bug 2: String Conversion Breaks Numeric Comparison (CRITICAL)**
 - **Issue:** On even-numbered attempts, the code converted `secret` from integer to string, causing `check_guess()` to use lexicographic (alphabetical) string comparison instead of numeric comparison. Example: guess "9" vs secret "50" would return "Too High" (wrong!) because "9" > "50" in string order.

@@ -1,5 +1,6 @@
 import random
 import streamlit as st
+import pandas as pd
 from logic_utils import (
     get_range_for_difficulty,
     parse_guess,
@@ -32,6 +33,16 @@ low, high = get_range_for_difficulty(difficulty)
 st.sidebar.caption(f"Range: {low} to {high}")
 st.sidebar.caption(f"Attempts allowed: {attempt_limit}")
 
+# --- UI: Game Dashboard ---
+col_score, col_attempts, col_diff = st.columns(3)
+col_score.metric("Score", st.session_state.get("score", 0))
+
+attempts_used = st.session_state.get("attempts", 1) - 1
+attempts_rem = max(0, attempt_limit - attempts_used)
+col_attempts.metric("Attempts Left", attempts_rem)
+col_diff.metric("Difficulty", difficulty)
+
+# Session State Initialization
 if "secret" not in st.session_state:
     st.session_state.secret = random.randint(low, high)
 
@@ -54,6 +65,11 @@ st.info(
     f"Attempts left: {attempt_limit - st.session_state.attempts}"
 )
 
+# Progress Bar
+progress_val = min(1.0, (st.session_state.attempts - 1) / attempt_limit)
+st.progress(progress_val)
+
+# Debug Info
 with st.expander("Developer Debug Info"):
     st.write("Secret:", st.session_state.secret)
     st.write("Attempts:", st.session_state.attempts)
@@ -78,6 +94,7 @@ if new_game:
     st.session_state.attempts = 0
     st.session_state.secret = random.randint(1, 100)
     st.success("New game started.")
+    st.session_state.history = []
     st.rerun()
 
 if st.session_state.status != "playing":
@@ -93,10 +110,14 @@ if submit:
     ok, guess_int, err = parse_guess(raw_guess)
 
     if not ok:
-        st.session_state.history.append(raw_guess)
+        st.session_state.history.append({
+            "Attempt": st.session_state.attempts, 
+            "Guess": raw_guess, 
+            "Result": "Error", 
+            "Feedback": err
+        })
         st.error(err)
     else:
-        st.session_state.history.append(guess_int)
 
         # FIX: Removed the buggy conditional that converted secret to string on even attempts.
         # This was causing lexicographic comparison instead of numeric comparison.
@@ -104,7 +125,20 @@ if submit:
         outcome, message = check_guess(guess_int, st.session_state.secret)
 
         if show_hint:
-            st.warning(message)
+            if outcome == "Win":
+                st.success(message, icon="🎉")
+            elif outcome == "Too High":
+                st.warning(message, icon="⬇️")
+            else:
+                st.info(message, icon="⬆️")
+        
+        # Save rich history
+        st.session_state.history.append({
+            "Attempt": st.session_state.attempts,
+            "Guess": guess_int,
+            "Result": outcome,
+            "Feedback": message
+        })
 
         st.session_state.score = update_score(
             current_score=st.session_state.score,
@@ -127,6 +161,12 @@ if submit:
                     f"The secret was {st.session_state.secret}. "
                     f"Score: {st.session_state.score}"
                 )
+
+# --- UI: Game History ---
+if st.session_state.history:
+    st.divider()
+    st.subheader("📜 Game History")
+    st.dataframe(pd.DataFrame(st.session_state.history), use_container_width=True)
 
 st.divider()
 st.caption("Built by an AI that claims this code is production-ready.")
